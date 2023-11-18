@@ -13,13 +13,18 @@ const Login = () => {
   const context = useContext(ApiContext);
 
   const { linkedInLogin } = useLinkedIn({
-    clientId: "86vhj2q7ukf83q",
-    redirectUri: `${window.location.origin}/linkedin`,
+    clientId: "86mrrthdb5hpim",
+    redirectUri: `http://localhost:3000/linkedin-openid/callback`,
     onSuccess: (code) => {
       console.log(code);
+      // setCode(code);
+      // setErrorMessage("");
     },
+    scope: "r_emailaddress, r_liteprofile, w_member_social",
     onError: (error) => {
       console.log(error);
+      // setCode("");
+      // setErrorMessage(error.errorMessage);
     },
   });
 
@@ -49,7 +54,7 @@ const Login = () => {
                 <img
                   onClick={linkedInLogin}
                   src={linkedin}
-                  alt="Sign in with Linked In"
+                  alt="Sign in with LinkedIn"
                   style={{ maxWidth: "180px", cursor: "pointer" }}
                 />
               </div>

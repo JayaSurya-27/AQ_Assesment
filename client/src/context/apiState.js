@@ -25,20 +25,20 @@ const ApiState = (props) => {
     localStorage.setItem("loginStatus", loginStatus.toString());
   }, [loginStatus]);
 
-  useEffect(() => {
-    if (loading && authTokens) {
-      updateToken();
-    }
+  // useEffect(() => {
+  //   if (loading && authTokens) {
+  //     updateToken();
+  //   }
 
-    const fourMinutes = 1000 * 60 * 4;
+  //   const fourMinutes = 1000 * 60 * 4;
 
-    const interval = setInterval(() => {
-      if (authTokens) {
-        updateToken();
-      }
-    }, fourMinutes);
-    return () => clearInterval(interval);
-  }, [authTokens, loading]);
+  //   const interval = setInterval(() => {
+  //     if (authTokens) {
+  //       updateToken();
+  //     }
+  //   }, fourMinutes);
+  //   return () => clearInterval(interval);
+  // }, [authTokens, loading]);
 
   const login = async ({ creds, e }) => {
     e.preventDefault();
@@ -93,48 +93,6 @@ const ApiState = (props) => {
     setLoginStatus(false);
     setProfile(null);
     toast.success("Logout successful");
-  };
-
-  const updateToken = async () => {
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (!refreshToken) {
-      console.log("Refresh token not found.");
-      logout();
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_ENDPOINT}refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refresh: refreshToken }),
-      });
-
-      if (!response.ok) {
-        console.error("Failed to refresh token:", response.statusText);
-        toast.error("Please login again ");
-        logout();
-        return;
-      }
-
-      const data = await response.json();
-      const { access, refresh } = data;
-
-      localStorage.setItem("accessToken", access);
-      localStorage.setItem("refreshToken", refresh);
-      console.log("Token refresh successful");
-    } catch (error) {
-      console.error("Error during token refresh:", error);
-      toast.error("Please login again ");
-      logout();
-    } finally {
-      if (loading) {
-        setLoading(false);
-      }
-    }
   };
 
   const signUp = async ({ creds, e }) => {

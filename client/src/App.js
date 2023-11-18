@@ -12,6 +12,7 @@ import "./css/App.css";
 import "react-toastify/dist/ReactToastify.css";
 import ViewProfileCandidate from "./components/viewProfileCandidate";
 import { LinkedInCallback } from "react-linkedin-login-oauth2";
+import LinkedInPage from "./components/LinkedInPage";
 
 const App = () => {
   return (
@@ -23,7 +24,12 @@ const App = () => {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
               <Route exact path="/logout" element={<Logout />} />
-              <Route exact path="/linkedin" component={LinkedInCallback} />
+              <Route
+                exact
+                path="/linkedin-openid/callback"
+                component={LinkedInCallback}
+              />
+              {/* <Route path="/a" component={LinkedInPage} /> */}
 
               {/* private Routes */}
 
