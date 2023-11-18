@@ -5,6 +5,7 @@ import ApiContext from "../context/apiContext";
 import "./../css/login.css";
 import { useLinkedIn } from "react-linkedin-login-oauth2";
 import linkedin from "react-linkedin-login-oauth2/assets/linkedin.png";
+import { LinkedIn } from "react-linkedin-login-oauth2";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -12,21 +13,17 @@ const Login = () => {
 
   const context = useContext(ApiContext);
 
-  const { linkedInLogin } = useLinkedIn({
-    clientId: "86mrrthdb5hpim",
-    redirectUri: `http://localhost:3000/linkedin-openid/callback`,
-    onSuccess: (code) => {
-      console.log(code);
-      // setCode(code);
-      // setErrorMessage("");
-    },
-    scope: "r_emailaddress, r_liteprofile, w_member_social",
-    onError: (error) => {
-      console.log(error);
-      // setCode("");
-      // setErrorMessage(error.errorMessage);
-    },
-  });
+  // const { linkedInLogin } = useLinkedIn({
+  //   clientId: "86mrrthdb5hpim",
+  //   redirectUri: `http://localhost:3000/linkedin`,
+  //   scope: "w_member_social",
+  //   onSuccess: (code) => {
+  //     console.log(code);
+  //   },
+  //   onError: (error) => {
+  //     console.log(error);
+  //   },
+  // });
 
   const { loginStatus, login } = context;
   if (loginStatus) {
@@ -51,12 +48,26 @@ const Login = () => {
             <form onSubmit={(e) => login({ creds: { username, password }, e })}>
               <h1>Sign in</h1>
               <div className="social-container">
-                <img
-                  onClick={linkedInLogin}
-                  src={linkedin}
-                  alt="Sign in with LinkedIn"
-                  style={{ maxWidth: "180px", cursor: "pointer" }}
-                />
+                <LinkedIn
+                  clientId="86mrrthdb5hpim"
+                  redirectUri={`http://localhost:3000/linkedin`}
+                  onSuccess={(code) => {
+                    console.log(code);
+                  }}
+                  scope="w_member_social"
+                  onError={(error) => {
+                    console.log(error);
+                  }}
+                >
+                  {({ linkedInLogin }) => (
+                    <img
+                      onClick={linkedInLogin}
+                      src={linkedin}
+                      alt="Sign in with Linked In"
+                      style={{ maxWidth: "180px", cursor: "pointer" }}
+                    />
+                  )}
+                </LinkedIn>
               </div>
 
               <span>or use your account</span>
