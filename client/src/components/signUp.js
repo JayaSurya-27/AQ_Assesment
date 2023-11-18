@@ -5,6 +5,8 @@ import "./../css/login.css";
 
 function SignUp() {
   const [userName, setUserName] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -32,16 +34,31 @@ function SignUp() {
           <div className="form-container sign-in-container">
             <form
               onSubmit={(e) =>
-                signUp({ creds: { userName, password, confirmPassword }, e })
+                signUp({
+                  creds: { userName, password, confirmPassword, email, name },
+                  e,
+                })
               }
             >
               <h1 style={{ marginBottom: "20px" }}>Sign Up</h1>
 
               <input
                 type="string"
-                placeholder="Email / phone"
+                placeholder="User Name"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
+              />
+              <input
+                type="string"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <input
                 type="password"

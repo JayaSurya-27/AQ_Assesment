@@ -3,19 +3,27 @@ import { Link, Navigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import ApiContext from "../context/apiContext";
 import "./../css/login.css";
+import { useLinkedIn } from "react-linkedin-login-oauth2";
+import linkedin from "react-linkedin-login-oauth2/assets/linkedin.png";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const context = useContext(ApiContext);
-  const {
-    loginStatus,
-    authTokens,
-    login,
-    googleSuccess,
-    googleFailure,
-  } = context;
+
+  const { linkedInLogin } = useLinkedIn({
+    clientId: "86vhj2q7ukf83q",
+    redirectUri: `${window.location.origin}/linkedin`,
+    onSuccess: (code) => {
+      console.log(code);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const { loginStatus, login } = context;
   if (loginStatus) {
     return <Navigate to="/logout" />;
   }
@@ -30,7 +38,6 @@ const Login = () => {
             font-family: "Montserrat", sans-serif;
           }
 
-    
         `}
       </style>
       <div className="parent_div">
@@ -39,10 +46,11 @@ const Login = () => {
             <form onSubmit={(e) => login({ creds: { username, password }, e })}>
               <h1>Sign in</h1>
               <div className="social-container">
-                <GoogleLogin
-                  onSuccess={googleSuccess}
-                  onError={googleFailure}
-                  ux_mode="popup"
+                <img
+                  onClick={linkedInLogin}
+                  src={linkedin}
+                  alt="Sign in with Linked In"
+                  style={{ maxWidth: "180px", cursor: "pointer" }}
                 />
               </div>
 

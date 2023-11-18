@@ -10,14 +10,13 @@ const ApiState = (props) => {
     localStorage.getItem("loginStatus") === "true" || false
   );
   const [profile, setProfile] = useState(null);
-  const [isRecruiter, setIsRecruiter] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authTokens, setAuthTokens] = useState(
     localStorage.getItem("accessToken")
   );
-  const [candidatRows, setCandidateRows] = useState([]);
 
-  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
+  const API_ENDPOINT =
+    process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000/";
   console.log(typeof API_ENDPOINT);
   console.log("API_ENDPOINT:", API_ENDPOINT);
   const navigateTo = useNavigate();
@@ -56,7 +55,7 @@ const ApiState = (props) => {
     console.log("Request URL:");
 
     try {
-      const response = await axios.post(`${API_ENDPOINT}api/token/`, reqBody, {
+      const response = await axios.post(`${API_ENDPOINT}login`, reqBody, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -69,9 +68,8 @@ const ApiState = (props) => {
         console.log(response.data);
         console.log(localStorage.getItem("accessToken"));
         console.log(localStorage.getItem("refreshToken"));
-        getId(creds.username);
         setLoginStatus(true);
-        navigateTo("/createProfile");
+        navigateTo("/");
         toast.success("Login successful");
       } else {
         console.error("Login failed");
@@ -91,46 +89,10 @@ const ApiState = (props) => {
     }
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("isRecruiter");
     localStorage.removeItem("userId");
     setLoginStatus(false);
     setProfile(null);
     toast.success("Logout successful");
-  };
-
-  const googleSuccess = (response) => {
-    const decoded = jwt_decode(response.credential);
-    console.log(decoded);
-
-    const reqBody = {
-      username: decoded.email,
-      password: decoded.sub,
-      user_type: isRecruiter ? "Recruiter" : "Candidate",
-    };
-
-    try {
-      const url = `${API_ENDPOINT}googleLogin/`;
-      axios.post(url, reqBody).then((response) => {
-        if (response.status === 200) {
-          login({
-            creds: { username: decoded.email, password: decoded.sub },
-            e: { preventDefault: () => {} },
-          });
-          navigateTo("/createProfile");
-        } else {
-          console.error("Login failed");
-          toast.error("Login failed");
-        }
-      });
-    } catch (error) {
-      console.error("Error during login:", error);
-      toast.error("Login failed");
-    }
-  };
-
-  const googleFailure = (error) => {
-    console.log(error);
-    toast.error("Login failed");
   };
 
   const updateToken = async () => {
@@ -143,7 +105,7 @@ const ApiState = (props) => {
     }
 
     try {
-      const response = await fetch(`${API_ENDPOINT}api/token/refresh/`, {
+      const response = await fetch(`${API_ENDPOINT}refresh`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -175,46 +137,13 @@ const ApiState = (props) => {
     }
   };
 
-  const getId = async (username) => {
-    try {
-      const response = await axios.get(
-        `${API_ENDPOINT}getUserId/?username=${username}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        const data = response.data;
-        localStorage.setItem("username", username);
-        localStorage.setItem("userId", data.id);
-        console.log("Updated data:", data);
-        console.log(typeof localStorage.getItem("isRecruiter"));
-      } else {
-        console.error("Login failed");
-      }
-    } catch (error) {
-      console.error("Error getting user id:", error);
-    }
-  };
-
   const signUp = async ({ creds, e }) => {
-    console.log("Sign up creds:", creds);
-    console.log(API_ENDPOINT);
     e.preventDefault();
 
-    const { userName, password, confirmPassword } = creds;
+    const { userName, password, confirmPassword, name, email } = creds;
 
-    if (!userName) {
-      toast.error("Username cannot be empty");
-      return;
-    }
-
-    if (!password) {
-      toast.error("Password cannot be empty");
+    if (!userName || !password || !confirmPassword || !name || !email) {
+      toast.error("All fields are required");
       return;
     }
 
@@ -226,18 +155,29 @@ const ApiState = (props) => {
     const reqBody = {
       username: userName,
       password: password,
-      user_type: isRecruiter ? "Recruiter" : "Candidate",
+      name: name,
+      email: email,
     };
 
     try {
-      const url = `${API_ENDPOINT}signup/`;
-      const response = await axios.post(url, reqBody);
+      const response = await axios.post(`${API_ENDPOINT}signup`, reqBody, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
 
-      console.log("API Response:", response.data);
-      navigateTo("/login");
-      toast.success("Sign up successful");
+      if (response.status === 201) {
+        console.log("API Response:", response.data);
+        navigateTo("/login");
+        toast.success("Sign up successful");
+      } else {
+        console.error("Sign up failed");
+        toast.error("Sign up failed");
+      }
     } catch (error) {
       console.error("API Error:", error);
+      toast.error("Sign up failed");
     }
   };
 
@@ -246,14 +186,9 @@ const ApiState = (props) => {
       value={{
         loginStatus,
         profile,
-        isRecruiter,
-        setIsRecruiter,
-
         login,
         logout,
         signUp,
-        googleSuccess,
-        googleFailure,
       }}
     >
       {props.children}
