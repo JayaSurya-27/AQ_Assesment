@@ -18,7 +18,7 @@ import { nanoid } from "nanoid";
 import ScienceIcon from "@mui/icons-material/Science";
 import SchoolIcon from "@mui/icons-material/School";
 import { BallTriangle } from "react-loader-spinner";
-import jwtDecode from "jwt-decode";
+import Upload from "../upload";
 
 const theme = createTheme({
   palette: {
@@ -169,6 +169,9 @@ export default function ViewProfileCandidate() {
               >
                 Welcome, {localStorage.getItem("username")}
               </Typography>
+              <div>
+                <Upload />
+              </div>
               <Paper
                 align="center"
                 elevation={10}

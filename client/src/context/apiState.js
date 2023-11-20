@@ -13,7 +13,6 @@ const ApiState = (props) => {
   const [loading, setLoading] = useState(true);
   const [isLinkedIn, setIsLinkedIn] = useState(false);
   const [linkedInAuthToken, setlinkedInAuthToken] = useState(null);
-  const [linkedInAccessToken, setLinkedInAccessToken] = useState(null);
   const [authTokens, setAuthTokens] = useState(
     localStorage.getItem("accessToken")
   );
@@ -146,7 +145,7 @@ const ApiState = (props) => {
         },
       }
     );
-    setLinkedInAccessToken(response.data.access_token);
+    localStorage.setItem("linkedInAccessToken", response.data.access_token);
     // console.log("API Response:", response);
   };
 
