@@ -6,11 +6,13 @@ import "./../css/login.css";
 import { useLinkedIn } from "react-linkedin-login-oauth2";
 import linkedin from "react-linkedin-login-oauth2/assets/linkedin.png";
 import { LinkedIn } from "react-linkedin-login-oauth2";
+import { useNavigate } from "react-router-dom";
+import jwtDecode from "jwt-decode";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigateTo = useNavigate();
   const context = useContext(ApiContext);
 
   // const { linkedInLogin } = useLinkedIn({
@@ -25,7 +27,14 @@ const Login = () => {
   //   },
   // });
 
-  const { loginStatus, login } = context;
+  const {
+    loginStatus,
+    login,
+    setLoginStatus,
+    setlinkedInAuthToken,
+    setIsLinkedIn,
+    fetchUserInfo,
+  } = context;
   if (loginStatus) {
     return <Navigate to="/logout" />;
   }
@@ -53,6 +62,12 @@ const Login = () => {
                   redirectUri={`http://localhost:3000/linkedin`}
                   onSuccess={(code) => {
                     console.log(code);
+                    setLoginStatus(true);
+                    localStorage.setItem("linkedInAuthToken", code);
+                    setlinkedInAuthToken(code);
+                    setIsLinkedIn(true);
+                    fetchUserInfo();
+                    navigateTo("/");
                   }}
                   scope="w_member_social"
                   onError={(error) => {

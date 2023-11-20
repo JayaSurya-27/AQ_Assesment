@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 require("dotenv").config();
+const axios = require("axios");
+const e = require("express");
 
 const app = express();
 app.use(cors());
@@ -141,6 +143,43 @@ app.post("/login", async (req, res) => {
 // Protected route example
 app.get("/protected", verifyToken, (req, res) => {
   res.json({ message: "This is a protected route.", user: req.user });
+});
+
+app.post("/linkedin/access-token", async (req, res) => {
+  const { code } = req.body;
+  const clientId = "YOUR_CLIENT_ID";
+  const clientSecret = "YOUR_CLIENT_SECRET";
+  const redirectUri = "YOUR_REDIRECT_URI";
+  console.log(code);
+
+  const params = new URLSearchParams({
+    grant_type: "authorization_code",
+    code,
+    client_id: "86mrrthdb5hpim",
+    client_secret: "88Z7TXDrE1u9mx8i",
+    redirect_uri: "http://localhost:3000/linkedin",
+  });
+
+  try {
+    const response = await fetch(
+      "https://www.linkedin.com/oauth/v2/accessToken",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: params.toString(),
+      }
+    );
+    
+
+    const data = await response.json();
+    console.log(data);
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 const PORT = process.env.PORT || 8000;

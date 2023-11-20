@@ -11,6 +11,9 @@ const ApiState = (props) => {
   );
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isLinkedIn, setIsLinkedIn] = useState(false);
+  const [linkedInAuthToken, setlinkedInAuthToken] = useState(null);
+  const [linkedInAccessToken, setLinkedInAccessToken] = useState(null);
   const [authTokens, setAuthTokens] = useState(
     localStorage.getItem("accessToken")
   );
@@ -24,21 +27,6 @@ const ApiState = (props) => {
   useEffect(() => {
     localStorage.setItem("loginStatus", loginStatus.toString());
   }, [loginStatus]);
-
-  // useEffect(() => {
-  //   if (loading && authTokens) {
-  //     updateToken();
-  //   }
-
-  //   const fourMinutes = 1000 * 60 * 4;
-
-  //   const interval = setInterval(() => {
-  //     if (authTokens) {
-  //       updateToken();
-  //     }
-  //   }, fourMinutes);
-  //   return () => clearInterval(interval);
-  // }, [authTokens, loading]);
 
   const login = async ({ creds, e }) => {
     e.preventDefault();
@@ -90,6 +78,8 @@ const ApiState = (props) => {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userId");
+    localStorage.removeItem("loginStatus");
+    localStorage.removeItem("linkedInAuthToken");
     setLoginStatus(false);
     setProfile(null);
     toast.success("Logout successful");
@@ -139,6 +129,27 @@ const ApiState = (props) => {
     }
   };
 
+  const fetchUserInfo = async () => {
+    const code = localStorage.getItem("linkedInAuthToken");
+    console.log("code:", code);
+    const reqBody = {
+      code: code,
+    };
+
+    const response = await axios.post(
+      `${API_ENDPOINT}linkedin/access-token`,
+      reqBody,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }
+    );
+    setLinkedInAccessToken(response.data.access_token);
+    // console.log("API Response:", response);
+  };
+
   return (
     <ApiContext.Provider
       value={{
@@ -147,6 +158,13 @@ const ApiState = (props) => {
         login,
         logout,
         signUp,
+        setLoginStatus,
+
+        linkedInAuthToken,
+        setlinkedInAuthToken,
+        isLinkedIn,
+        setIsLinkedIn,
+        fetchUserInfo,
       }}
     >
       {props.children}

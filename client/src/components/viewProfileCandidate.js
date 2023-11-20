@@ -18,6 +18,7 @@ import { nanoid } from "nanoid";
 import ScienceIcon from "@mui/icons-material/Science";
 import SchoolIcon from "@mui/icons-material/School";
 import { BallTriangle } from "react-loader-spinner";
+import jwtDecode from "jwt-decode";
 
 const theme = createTheme({
   palette: {
@@ -56,6 +57,20 @@ const exprSearalizer = (data) => {
 };
 
 export default function ViewProfileCandidate() {
+  // const storedToken = localStorage.getItem("linkedInAuthToken");
+  // console.log("Stored Token:", storedToken);
+
+  // if (storedToken) {
+  //   try {
+  //     const decodedToken = jwtDecode(storedToken);
+  //     console.log("Decoded Token:", decodedToken);
+  //   } catch (error) {
+  //     console.error("Error decoding token:", error);
+  //   }
+  // } else {
+  //   console.error("No token found in localStorage");
+  // }
+
   const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
   const getCandidate = async (accToken, uId) => {
     console.log("View Profile Candidate API Fecth Call");
