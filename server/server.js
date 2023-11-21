@@ -16,11 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  connectionString: process.env.POSTGRES_URL + "?sslmode=require",
 });
 
 // Secret key for JWT
@@ -137,7 +133,15 @@ app.post("/login", async (req, res) => {
       JWT_SECRET
     );
 
-    res.json({ token });
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email, // Assuming there is an email field in your users table
+        name: user.name, // Assuming there is a name field in your users table
+      },
+    });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -177,7 +181,6 @@ app.post("/linkedin/access-token", async (req, res) => {
     );
 
     const data = await response.json();
-    res.json(data);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
@@ -268,17 +271,25 @@ app.post("/linkedin/access-token", async (req, res) => {
 //   }
 // });
 
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "uploads"); // Destination folder for uploaded files
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, `${file.originalname}`); // Keeping the original filename
+//   },
+// });
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads"); // Destination folder for uploaded files
-  },
+  destination: "uploads",
   filename: (req, file, cb) => {
-    cb(null, `${file.originalname}`); // Keeping the original filename
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
   },
 });
-
 const upload = multer({
-  storage,
+  storage: storage,
   limits: { fileSize: 1024 * 1024 }, // Example limit: 1MB file size
 }).single("image"); // Expecting a single file with the field name 'image'
 
@@ -287,6 +298,7 @@ app.use("/uploads", express.static("uploads"));
 
 // Endpoint to handle the image upload
 app.post("/upload", (req, res) => {
+  console.log("uploading file");
   upload(req, res, (err) => {
     if (err) {
       // Handle multer upload error

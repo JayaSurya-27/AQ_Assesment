@@ -12,6 +12,7 @@ const ApiState = (props) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isLinkedIn, setIsLinkedIn] = useState(false);
+  const [currentuser, setCurrentuser] = useState([]);
   const [linkedInAuthToken, setlinkedInAuthToken] = useState(null);
   const [authTokens, setAuthTokens] = useState(
     localStorage.getItem("accessToken")
@@ -53,8 +54,8 @@ const ApiState = (props) => {
         localStorage.setItem("accessToken", response.data.access);
         localStorage.setItem("refreshToken", response.data.refresh);
         console.log(response.data);
-        console.log(localStorage.getItem("accessToken"));
-        console.log(localStorage.getItem("refreshToken"));
+        setCurrentuser(response.data.user);
+        console.log("Current User:", currentuser);
         setLoginStatus(true);
         navigateTo("/");
         toast.success("Login successful");
@@ -158,6 +159,18 @@ const ApiState = (props) => {
     }
   };
 
+  const testing = async () => {
+    try {
+      const response = await axios.get(
+        "https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=86mrrthdb5hpim&redirect_uri=http://localhost:3000/linkedin&state=foobar&scope=w_member_social"
+      );
+      console.log(response);
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      throw error;
+    }
+  };
+
   return (
     <ApiContext.Provider
       value={{
@@ -173,6 +186,8 @@ const ApiState = (props) => {
         isLinkedIn,
         setIsLinkedIn,
         fetchUserInfo,
+        currentuser,
+        testing,
       }}
     >
       {props.children}

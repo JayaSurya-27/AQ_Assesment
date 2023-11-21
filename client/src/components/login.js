@@ -69,7 +69,7 @@ const Login = () => {
                     fetchUserInfo();
                     navigateTo("/");
                   }}
-                  scope="w_member_social"
+                  scope="email openid profile w_member_social"
                   onError={(error) => {
                     console.log(error);
                   }}
