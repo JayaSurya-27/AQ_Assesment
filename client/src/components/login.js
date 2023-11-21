@@ -10,10 +10,9 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
   const navigateTo = useNavigate();
   const context = useContext(ApiContext);
-
+  const FRONTURI = process.env.REACT_APP_FRONTEND_URI;
   const {
     loginStatus,
     login,
@@ -46,7 +45,7 @@ const Login = () => {
               <div className="social-container">
                 <LinkedIn
                   clientId="86mrrthdb5hpim"
-                  redirectUri={`${API_ENDPOINT}linkedin`}
+                  redirectUri={`${FRONTURI}linkedin`}
                   onSuccess={(code) => {
                     console.log(code);
                     setLoginStatus(true);
