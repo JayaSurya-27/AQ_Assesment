@@ -45,7 +45,7 @@ const Login = () => {
               <div className="social-container">
                 <LinkedIn
                   clientId="86mrrthdb5hpim"
-                  redirectUri={`${FRONTURI}linkedin`}
+                  redirectUri={`http://localhost:3000/linkedin`}
                   onSuccess={(code) => {
                     console.log(code);
                     setLoginStatus(true);
