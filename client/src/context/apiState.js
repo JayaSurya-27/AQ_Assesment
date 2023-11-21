@@ -42,7 +42,7 @@ const ApiState = (props) => {
     console.log("Request URL:");
 
     try {
-      const response = await axios.post(`${API_ENDPOINT}/login`, reqBody, {
+      const response = await axios.post(`${API_ENDPOINT}login`, reqBody, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
