@@ -13,7 +13,7 @@ const path = require("path");
 const app = express();
 app.use(
   cors({
-    origin: ["https://aq-assesment-client-d24ijw80g-jayasurya-27.vercel.app/"],
+    origin: ["https://aq-assesment-client-d24ijw80g-jayasurya-27.vercel.app"],
     methods: ["GET", "POST"],
     credentials: true, // enable set cookie
   })
