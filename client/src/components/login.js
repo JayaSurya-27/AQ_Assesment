@@ -1,31 +1,17 @@
 import React, { useState, useContext } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
 import ApiContext from "../context/apiContext";
 import "./../css/login.css";
 import { useLinkedIn } from "react-linkedin-login-oauth2";
 import linkedin from "react-linkedin-login-oauth2/assets/linkedin.png";
 import { LinkedIn } from "react-linkedin-login-oauth2";
 import { useNavigate } from "react-router-dom";
-import jwtDecode from "jwt-decode";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigateTo = useNavigate();
   const context = useContext(ApiContext);
-
-  // const { linkedInLogin } = useLinkedIn({
-  //   clientId: "86mrrthdb5hpim",
-  //   redirectUri: `http://localhost:3000/linkedin`,
-  //   scope: "w_member_social",
-  //   onSuccess: (code) => {
-  //     console.log(code);
-  //   },
-  //   onError: (error) => {
-  //     console.log(error);
-  //   },
-  // });
 
   const {
     loginStatus,

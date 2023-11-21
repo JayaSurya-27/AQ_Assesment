@@ -150,12 +150,44 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// app.post("/linkedin/access-token", async (req, res) => {
+//   const { code } = req.body;
+
+//   console.log("code");
+
+//   const params = new URLSearchParams({
+//     grant_type: "authorization_code",
+//     code,
+//     client_id: "86mrrthdb5hpim",
+//     client_secret: "88Z7TXDrE1u9mx8i",
+//     redirect_uri: "http://localhost:3000/linkedin",
+//   });
+
+//   try {
+//     console.log("in try");
+//     const response = await fetch(
+//       "https://www.linkedin.com/oauth/v2/accessToken",
+//       {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/x-www-form-urlencoded",
+//         },
+//         body: params.toString(),
+//       }
+//     );
+//     console.log("in 2");
+
+//     const data = await response.json();
+//     const decodedata = jwt_decode(data.access_token);
+//     console.log(decodedata);
+//     console.log(data);
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
 app.post("/linkedin/access-token", async (req, res) => {
   const { code } = req.body;
-  const clientId = "YOUR_CLIENT_ID";
-  const clientSecret = "YOUR_CLIENT_SECRET";
-  const redirectUri = "YOUR_REDIRECT_URI";
-  console.log(code);
 
   const params = new URLSearchParams({
     grant_type: "authorization_code",
@@ -178,6 +210,15 @@ app.post("/linkedin/access-token", async (req, res) => {
     );
 
     const data = await response.json();
+    console.log(data);
+
+    let decodedData = null;
+    if (data.id_token) {
+      decodedData = jwt.decode(data.id_token); // Use jwtDecode instead of jwt_decode
+      console.log(decodedData);
+    }
+
+    res.status(200).json({ data, decodedData }); // Send the decoded data along with the original response data
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
@@ -276,6 +317,7 @@ app.post("/linkedin/access-token", async (req, res) => {
 //     cb(null, `${file.originalname}`); // Keeping the original filename
 //   },
 // });
+
 const storage = multer.diskStorage({
   destination: "uploads",
   filename: (req, file, cb) => {

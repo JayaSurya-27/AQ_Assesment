@@ -44,7 +44,7 @@ const theme = createTheme({
 
 export default function ViewProfileCandidate() {
   const context = React.useContext(ApiContext);
-  const { currentuser } = context;
+  const { currentuser, logout } = context;
   const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
   const getCandidate = async (accToken, uId) => {
     console.log("View Profile Candidate API Fecth Call");
@@ -76,6 +76,14 @@ export default function ViewProfileCandidate() {
           }}
         >
           <>
+            <div
+              style={{
+                marginLeft: "80vw",
+                marginTop: "-40px",
+              }}
+            >
+              <button onClick={(e) => logout(e)}>Logout</button>
+            </div>
             <Typography
               component="h1"
               variant="h2"
