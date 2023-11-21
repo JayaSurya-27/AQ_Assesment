@@ -194,7 +194,7 @@ app.post("/linkedin/access-token", async (req, res) => {
     code,
     client_id: "86mrrthdb5hpim",
     client_secret: "88Z7TXDrE1u9mx8i",
-    redirect_uri: "http://localhost:3000/linkedin",
+    redirect_uri: "https://aq-assesment-client.vercel.app/linkedin",
   });
 
   try {
