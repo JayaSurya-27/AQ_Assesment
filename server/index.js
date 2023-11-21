@@ -198,7 +198,7 @@ app.post("/linkedin/access-token", async (req, res) => {
   });
 
   try {
-    const response = await fetch(
+    const response = await axios(
       "https://www.linkedin.com/oauth/v2/accessToken",
       {
         method: "POST",
