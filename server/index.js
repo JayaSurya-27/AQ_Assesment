@@ -6,9 +6,9 @@ const cors = require("cors");
 require("dotenv").config();
 const axios = require("axios");
 const e = require("express");
-// const fs = require("fs");
-// const multer = require("multer");
-// const path = require("path");
+const fs = require("fs");
+const multer = require("multer");
+const path = require("path");
 
 const app = express();
 
@@ -278,36 +278,36 @@ app.post("/linkedin/access-token", async (req, res) => {
 //     cb(null, `${file.originalname}`); // Keeping the original filename
 //   },
 // });
-// const storage = multer.diskStorage({
-//   destination: "uploads",
-//   filename: (req, file, cb) => {
-//     cb(
-//       null,
-//       file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-//     );
-//   },
-// });
-// const upload = multer({
-//   storage: storage,
-//   limits: { fileSize: 1024 * 1024 }, // Example limit: 1MB file size
-// }).single("image"); // Expecting a single file with the field name 'image'
+const storage = multer.diskStorage({
+  destination: "uploads",
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 }, // Example limit: 1MB file size
+}).single("image"); // Expecting a single file with the field name 'image'
 
-// // Serve uploaded files statically
-// app.use("/uploads", express.static("uploads"));
+// Serve uploaded files statically
+app.use("/uploads", express.static("uploads"));
 
 // Endpoint to handle the image upload
 app.post("/upload", (req, res) => {
   console.log("uploading file");
-  // upload(req, res, (err) => {
-  //   if (err) {
-  //     // Handle multer upload error
-  //     return res
-  //       .status(400)
-  //       .json({ message: "File upload failed", error: err.message });
-  //   }
-  //   // File uploaded successfully
-  return res.json({ message: "File uploaded successfully" });
-  // });
+  upload(req, res, (err) => {
+    if (err) {
+      // Handle multer upload error
+      return res
+        .status(400)
+        .json({ message: "File upload failed", error: err.message });
+    }
+    // File uploaded successfully
+    return res.json({ message: "File uploaded successfully" });
+  });
 });
 
 const PORT = process.env.PORT || 8000;
