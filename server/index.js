@@ -217,8 +217,11 @@ app.post("/linkedin/access-token", async (req, res) => {
       decodedData = jwt.decode(data.id_token); // Use jwtDecode instead of jwt_decode
       console.log(decodedData);
     }
-
-    res.status(200).json({ data, decodedData }); // Send the decoded data along with the original response data
+    if (data.access_token) {
+      res.status(200).json({ data, decodedData });
+    } else {
+      res.status(202).json({ error: "This info is irrelavent" });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });

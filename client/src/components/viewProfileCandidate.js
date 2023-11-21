@@ -44,7 +44,8 @@ const theme = createTheme({
 
 export default function ViewProfileCandidate() {
   const context = React.useContext(ApiContext);
-  const { currentuser, logout } = context;
+  const [text, setText] = useState("");
+  const { currentuser, logout, createLinkedInPost } = context;
   const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
   const getCandidate = async (accToken, uId) => {
     console.log("View Profile Candidate API Fecth Call");
@@ -61,7 +62,10 @@ export default function ViewProfileCandidate() {
       });
     return result;
   };
-
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createLinkedInPost();
+  };
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="lg">
@@ -145,6 +149,18 @@ export default function ViewProfileCandidate() {
               </Paper>
             </Paper>
             <Upload />
+            <br></br>
+            <form onSubmit={handleSubmit}>
+              <label>
+                Enter your LinkedIn post text:
+                <input
+                  type="text"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                />
+              </label>
+              <button type="submit">Create Post</button>
+            </form>
             <Paper
               align="center"
               elevation={10}

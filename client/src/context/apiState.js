@@ -79,6 +79,7 @@ const ApiState = (props) => {
     localStorage.removeItem("userId");
     localStorage.removeItem("loginStatus");
     localStorage.removeItem("linkedInAuthToken");
+    localStorage.removeItem("linkedInAccessToken");
     setLoginStatus(false);
     setProfile(null);
     toast.success("Logout successful");
@@ -144,10 +145,22 @@ const ApiState = (props) => {
           },
         }
       );
-      if (response.data.access_token) {
-        localStorage.setItem("linkedInAccessToken", response.data.access_token);
+      // console.log(response);
+      if (response.status === 200) {
+        console.log(response);
+        localStorage.setItem(
+          "linkedInAccessToken",
+          response.data.data.access_token
+        );
+        const sub = response.data.decodedData.sub;
+        localStorage.setItem("sub", sub);
+        const obj = {
+          name: response.data.decodedData.name,
+          email: response.data.decodedData.email,
+          username: response.data.decodedData.email,
+        };
+        setCurrentuser(obj);
       }
-      console.log(response);
       console.log(
         "setting access token",
         localStorage.getItem("linkedInAccessToken")
@@ -170,6 +183,45 @@ const ApiState = (props) => {
     }
   };
 
+  async function createLinkedInPost(text) {
+    const url = "https://api.linkedin.com/v2/ugcPosts";
+    const accessToken = localStorage.getItem("linkedInAccessToken");
+    const sub = localStorage.getItem("sub");
+
+    const requestBody = {
+      author: `urn:li:person:${sub}`,
+      lifecycleState: "PUBLISHED",
+      specificContent: {
+        "com.linkedin.ugc.ShareContent": {
+          shareCommentary: {
+            text: text,
+          },
+          shareMediaCategory: "NONE",
+        },
+      },
+      visibility: {
+        "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+      },
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+      return data; // Return the response data
+    } catch (error) {
+      console.error("Error creating LinkedIn post:", error);
+      throw error;
+    }
+  }
+
   return (
     <ApiContext.Provider
       value={{
@@ -187,6 +239,7 @@ const ApiState = (props) => {
         fetchUserInfo,
         currentuser,
         testing,
+        createLinkedInPost,
       }}
     >
       {props.children}
