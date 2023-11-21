@@ -18,8 +18,7 @@ const ApiState = (props) => {
     localStorage.getItem("accessToken")
   );
 
-  const API_ENDPOINT =
-    process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000/";
+  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
   console.log(typeof API_ENDPOINT);
   console.log("API_ENDPOINT:", API_ENDPOINT);
   const navigateTo = useNavigate();
@@ -43,7 +42,7 @@ const ApiState = (props) => {
     console.log("Request URL:");
 
     try {
-      const response = await axios.post(`${API_ENDPOINT}login`, reqBody, {
+      const response = await axios.post(`${API_ENDPOINT}/login`, reqBody, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
