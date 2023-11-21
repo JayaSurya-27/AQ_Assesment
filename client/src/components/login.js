@@ -45,7 +45,7 @@ const Login = () => {
               <div className="social-container">
                 <LinkedIn
                   clientId="86mrrthdb5hpim"
-                  redirectUri={`https://aq-assesment-client-cfk6ozcvv-jayasurya-27.vercel.app/linkedin`}
+                  redirectUri={`https://aq-assesment-client.vercel.app/linkedin`}
                   onSuccess={(code) => {
                     console.log(code);
                     setLoginStatus(true);
