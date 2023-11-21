@@ -1,7 +1,7 @@
 const { Pool } = require("pg");
 const express = require("express");
 const jwt = require("jsonwebtoken");
-
+const bcrypt = require("bcrypt");
 const cors = require("cors");
 require("dotenv").config();
 const axios = require("axios");
@@ -94,8 +94,7 @@ app.post("/signup", async (req, res) => {
     }
 
     // Hash the password
-    // const hashedPassword = await bcrypt.hash(password, 10);
-    const hashedPassword = encryptPassword(password);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Insert the user into the database
     const result = await pool.query(
@@ -126,8 +125,7 @@ app.post("/login", async (req, res) => {
     const result = await pool.query(query, [username]);
     const user = result.rows[0];
 
-    // if (!user || !(await bcrypt.compare(password, user.password))) {
-    if (!user || encryptPassword(password) !== user.password) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: "Invalid username or password." });
     }
 
