@@ -6,10 +6,14 @@ const cors = require("cors");
 require("dotenv").config();
 const axios = require("axios");
 const e = require("express");
+const fs = require("fs");
+const multer = require("multer");
+const path = require("path");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -171,15 +175,128 @@ app.post("/linkedin/access-token", async (req, res) => {
         body: params.toString(),
       }
     );
-    
 
     const data = await response.json();
-    console.log(data);
     res.json(data);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+// app.post("/uploadToLinkedIn", async (req, res) => {
+
+//   try {
+//     const { code } = "req.body";
+//     // Handle LinkedIn API requests here using Axios or another HTTP library
+//     // Perform the steps to register the image upload and create the image share
+
+//     // Example:
+//     console.log("img upload");
+//     console.log(code);
+//     const registerUploadResponse = await axios.post(
+//       "https://api.linkedin.com/v2/assets?action=registerUpload",
+//       {
+//         /* Your request payload */
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${code}`,
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+
+//     // Handle the response and perform subsequent steps (upload image, create share, etc.)
+
+//     res.status(200).send("Image upload initiated successfully");
+//   } catch (error) {
+//     console.error("Error uploading image to LinkedIn:", error);
+//     res.status(500).send("Internal server error");
+//   }
+// });
+
+// app.post("/uploadToLinkedIn", upload.single("file"), async (req, res) => {
+//   try {
+//     const {
+//       file,
+//       body: { accessToken },
+//     } = req;
+
+//     if (!file) {
+//       return res.status(400).json({ error: "No file uploaded." });
+//     }
+
+//     const fileData = fs.readFileSync(file.path);
+
+//     const form = new FormData();
+//     form.append("file", fileData, {
+//       filename: file.originalname,
+//       contentType: file.mimetype,
+//     });
+
+//     const headers = {
+//       Authorization: `Bearer ${accessToken}`,
+//       ...form.getHeaders(),
+//     };
+
+//     const config = {
+//       headers: {
+//         ...headers,
+//         ...form.getHeaders(), // Update the headers here as well
+//       },
+//     };
+
+//     // Convert form data to a buffer before sending
+//     const bufferData = Buffer.from(form.getBuffer(), "binary");
+
+//     const uploadResponse = await axios.post(
+//       "https://api.linkedin.com/mediaUpload/C5522AQGTYER3k3ByHQ/feedshare-uploadedImage/0?ca=vector_feedshare&cn=uploads&m=AQJbrN86Zm265gAAAWemyz2pxPSgONtBiZdchrgG872QltnfYjnMdb2j3A&app=1953784&sync=0&v=beta&ut=2H-IhpbfXrRow1",
+//       bufferData, // Sending buffer data instead of form directly
+//       config // Passing the updated configuration
+//     );
+
+//     const mediaId = uploadResponse.data.asset;
+
+//     // Rest of your LinkedIn API interaction code...
+
+//     return res
+//       .status(200)
+//       .json({ message: "Posted to LinkedIn successfully!" });
+//   } catch (error) {
+//     return res.status(500).json({ error: error.message });
+//   }
+// });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads"); // Destination folder for uploaded files
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${file.originalname}`); // Keeping the original filename
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 1024 * 1024 }, // Example limit: 1MB file size
+}).single("image"); // Expecting a single file with the field name 'image'
+
+// Serve uploaded files statically
+app.use("/uploads", express.static("uploads"));
+
+// Endpoint to handle the image upload
+app.post("/upload", (req, res) => {
+  upload(req, res, (err) => {
+    if (err) {
+      // Handle multer upload error
+      return res
+        .status(400)
+        .json({ message: "File upload failed", error: err.message });
+    }
+    // File uploaded successfully
+    return res.json({ message: "File uploaded successfully" });
+  });
 });
 
 const PORT = process.env.PORT || 8000;

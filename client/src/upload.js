@@ -1,100 +1,53 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const LinkedInImageUploader = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const linkedInAccessToken = localStorage.getItem("linkedInAccessToken");
+const ImageUpload = () => {
+  const [image, setImage] = useState(null);
+  const API_ENDPOINT =
+    process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000/";
 
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+  const handleImageChange = (e) => {
+    const selectedImage = e.target.files[0];
+    setImage(selectedImage);
   };
 
-  const handleImageUpload = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    const code = localStorage.getItem("linkedInAuthToken");
+    formData.append("image", image);
+    formData.append("code", code);
+
     try {
-      // Step 1: Register image upload
-      const registerUploadResponse = await axios.post(
-        "https://api.linkedin.com/v2/assets?action=registerUpload",
-        {
-          registerUploadRequest: {
-            recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
-            owner: "urn:li:person:8675309",
-            serviceRelationships: [
-              {
-                relationshipType: "OWNER",
-                identifier: "urn:li:userGeneratedContent",
-              },
-            ],
-          },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${linkedInAccessToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      // Get upload URL and asset details from the response
-      const { uploadUrl } =
-        registerUploadResponse.data.value.uploadMechanism.com.linkedin
-          .digitalmedia.uploading.MediaUploadHttpRequest;
-
-      // Step 2: Upload image file to LinkedIn
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-
-      await axios.post(uploadUrl, formData, {
+      const response = await axios.post(`${API_ENDPOINT}upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      // Step 3: Create the image share
-      const createImageShareResponse = await axios.post(
-        "https://api.linkedin.com/v2/ugcPosts",
-        {
-          author: "urn:li:person:8675309",
-          lifecycleState: "PUBLISHED",
-          specificContent: {
-            "com.linkedin.ugc.ShareContent": {
-              shareCommentary: {
-                text: "Feeling inspired after meeting so many talented individuals at this year's conference. #talentconnect",
-              },
-              shareMediaCategory: "IMAGE",
-              media: [
-                {
-                  status: "READY",
-                  description: { text: "Center stage!" },
-                  media: registerUploadResponse.data.value.mediaArtifact,
-                  title: { text: "LinkedIn Talent Connect 2021" },
-                },
-              ],
-            },
-          },
-          visibility: {
-            "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
-          },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${linkedInAccessToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      console.log("Image share created:", createImageShareResponse);
+      console.log("Response from server:", response.data);
     } catch (error) {
-      console.error("Error uploading image to LinkedIn:", error);
+      console.error("Error:", error);
     }
   };
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleImageUpload}>Upload Image to LinkedIn</button>
+      <h2>Image Upload</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="imageInput">Select an image:</label>
+          <input
+            type="file"
+            id="imageInput"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+        </div>
+        <button type="submit">Post MyFav Pic</button>
+      </form>
     </div>
   );
 };
 
-export default LinkedInImageUploader;
+export default ImageUpload;

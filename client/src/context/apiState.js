@@ -129,24 +129,33 @@ const ApiState = (props) => {
   };
 
   const fetchUserInfo = async () => {
-    const code = localStorage.getItem("linkedInAuthToken");
-    console.log("code:", code);
-    const reqBody = {
-      code: code,
-    };
-
-    const response = await axios.post(
-      `${API_ENDPOINT}linkedin/access-token`,
-      reqBody,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+    try {
+      const code = localStorage.getItem("linkedInAuthToken");
+      const reqBody = {
+        code: code,
+      };
+      const response = await axios.post(
+        `${API_ENDPOINT}linkedin/access-token`,
+        reqBody,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+      if (response.data.access_token) {
+        localStorage.setItem("linkedInAccessToken", response.data.access_token);
       }
-    );
-    localStorage.setItem("linkedInAccessToken", response.data.access_token);
-    // console.log("API Response:", response);
+      console.log(response);
+      console.log(
+        "setting access token",
+        localStorage.getItem("linkedInAccessToken")
+      );
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      throw error;
+    }
   };
 
   return (
