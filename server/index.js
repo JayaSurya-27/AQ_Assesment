@@ -198,14 +198,13 @@ app.post("/linkedin/access-token", async (req, res) => {
   });
 
   try {
-    const response = await axios(
+    const response = await axios.post(
       "https://www.linkedin.com/oauth/v2/accessToken",
+      params.toString(), // Parameters should be sent as data
       {
-        method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: params.toString(),
       }
     );
 
